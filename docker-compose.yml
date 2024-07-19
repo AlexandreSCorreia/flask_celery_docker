@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    depends_on:
+      - rabbitmq
+      - redis
+
+  rabbitmq:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  redis:
+    image: "redis:6.0"
+
+  worker:
+    build: .
+    command: celery -A tasks worker --loglevel=info
+    depends_on:
+      - rabbitmq
+      - redis
